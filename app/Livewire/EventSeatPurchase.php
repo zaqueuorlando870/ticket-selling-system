@@ -7,9 +7,9 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 use App\Services\SeatReservationService;
-use App\Services\UserService;
 use App\Services\EventDataService;
 use App\Models\Event;
+use App\Services\UserService as GlobalUserService;
 
 class EventSeatPurchase extends Component
 {
@@ -17,13 +17,11 @@ class EventSeatPurchase extends Component
     public Event $event;
     public $seats;
     public $selectedSeat;
-    public $first_name;
-    public $last_name;
+    public $name;
     public $email;
 
     protected $rules = [
-        'first_name' => 'required|string',
-        'last_name' => 'required|string',
+        'name' => 'required|string',
         'email' => 'required|email',
         'selectedSeat' => 'required|exists:seats,id',
     ];
@@ -56,63 +54,43 @@ class EventSeatPurchase extends Component
     public function reserve($seatId)
     {
         $seatReservationService = app(SeatReservationService::class);
-        $seatReservationService->reserveSeat($seatId, request('user_id'));
-        $seat = $seatReservationService->find($seatId);
-        $seat->is_reserved = true;
-        $seat->save();
+        try {
+            $seatReservationService->reserveSeat($seatId, request('user_id'));
+        } catch (\Exception $e) {
+            session()->flash('error', 'Unable to purchase ticket: ' . $e->getMessage());
+            return;
+        }
     }
 
-    public function purchase($seatId){
-        dd($seatId);
-        $seatReservationService = app(SeatReservationService::class);
-        $seatReservationService->purchaseTicket($seatId, request('user_id'));
-        $seat = $seatReservationService->find($seatId);
-        $seat->is_sold = true;
-        $seat->save();
-    }
-
-
-    public function purchaseSeat($seatId = null, $eventId = null)
+    public function guestPurchase()
     {
-        if (is_null($seatId) && is_null($eventId)) {
-            $seatId = $this->selectedSeat;
-            $eventId = $this->eventId;
-        } else {
-            $this->selectedSeat = $seatId;
-            $this->eventId = $eventId;
-        }
-        $this->validate();
-        $seatReservationService = app(SeatReservationService::class);
-        $userService = app(\UserService::class);
-        $seat = $seatReservationService->getAvailableSeat($this->selectedSeat, $this->eventId);
-        if (!$seat) {
-            session()->flash('error', 'This seat is already taken or invalid.');
-            return;
-        }
-
-        // Create the user (attendee)
-        $userData = [
-            'email' => $this->email,
-            'first_name' => $this->first_name,
-            'last_name' => $this->last_name,
-            'password' => Str::random(16),
+        $data = [
+            'name' => $this->name ?? request('name'),
+            'email' => $this->email ?? request('email')
         ];
+        $userService = app(GlobalUserService::class);
         try {
-            $user = $userService->register($userData);
+            $user = $userService->getUserByEmail($this->email);
+            if (!$user) {
+                $user = $userService->registerGuest($data);
+            } 
+            request()->merge(['user_id' => $user->id]);
+            $this->purchase($this->selectedSeat);
+            session()->flash('status', 'Guest Registered Successfully');
         } catch (\Exception $e) {
-            session()->flash('error', 'Unable to create attendee user: ' . $e->getMessage());
+            session()->flash('error', 'Unable to Register User: ' . $e->getMessage());
             return;
         }
+    }
 
-        // Reserve the seat
+    public function purchase($seatId)
+    {
+        $seatReservationService = app(SeatReservationService::class);
         try {
-            // Attempt to reserve the seat
-            $seatReservationService->reserveSeat($seat->id, $user->id);
-            // Flash a success message
-            session()->flash('message', 'Seat purchased successfully and attendee information saved!');
+            $seatReservationService->purchaseTicket($seatId, request('user_id'));
         } catch (\Exception $e) {
-            // Flash an error message if the seat reservation fails
-            session()->flash('error', $e->getMessage());
+            session()->flash('error', 'Unable to purchase ticket: ' . $e->getMessage());
+            return;
         }
     }
 }

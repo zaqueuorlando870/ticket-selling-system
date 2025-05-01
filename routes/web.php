@@ -44,5 +44,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 Route::post('/seats/{id}/reserve', [EventSeatPurchase::class, 'reserve'])->name('seat.reserve');
 Route::post('/seats/{id}/purchase', [EventSeatPurchase::class, 'purchase'])->name('seat.purchase');
+Route::get('/seats/{id}/select', [EventSeatPurchase::class, 'selectSeat'])->name('seat.select');
+Route::post('/seats/{id}/guest', [EventSeatPurchase::class, 'guestPurchase'])->name('seat.guest');
 
 require __DIR__.'/auth.php';

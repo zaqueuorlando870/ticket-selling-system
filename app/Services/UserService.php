@@ -1,4 +1,6 @@
-<?php 
+<?php
+
+namespace App\Services;
 
 use Illuminate\Support\Facades\Hash;
 use App\Repositories\UserRepositoryInterface;
@@ -27,6 +29,11 @@ class UserService
         return $this->userRepository->create($userData);
     }
 
+    public function registerGuest($userData)
+    {
+        $userData['password'] = Hash::make(12345678);
+        return $this->userRepository->create($userData);
+    }
     public function updateProfile($userId, $userData)
     {
         $user = $this->userRepository->find($userId);
@@ -48,6 +55,15 @@ class UserService
         return false;
     }
 
+    public function getUserByEmail($email)
+    {
+        $user = $this->userRepository->findByEmail($email);
+        if ($user) {
+            return $user;
+        }
+        return false;
+    }
+
     public function getUserData($userId)
     {
         return $this->userRepository->find($userId);
@@ -63,5 +79,3 @@ class UserService
         return false;
     }
 }
-
-?>

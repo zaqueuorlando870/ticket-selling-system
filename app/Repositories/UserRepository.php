@@ -1,9 +1,10 @@
-<?php 
+<?php
 
 namespace App\Repositories;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Spatie\Permission\Models\Role;
 
 class UserRepository implements UserRepositoryInterface
 {
@@ -25,7 +26,8 @@ class UserRepository implements UserRepositoryInterface
     public function create($data)
     {
         $user = User::create($data);
-        $user->assignRole('attendee');
+        $role = Role::firstOrCreate(['name' => 'attendee']);
+        $user->assignRole($role->name);
         return $user;
     }
 
