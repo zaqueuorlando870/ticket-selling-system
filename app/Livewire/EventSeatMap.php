@@ -2,25 +2,31 @@
 
 namespace App\Livewire;
 
-use App\Models\Event;
-use App\Models\Seat;
+use App\Services\EventDataService;
+use App\Services\SeatReservationService;
 use Livewire\Component;
 
 class EventSeatMap extends Component
 {
-    public Event $event;
+    public $event;
 
-    public function mount(Event $event)
+    public function mount($eventId)
     {
-        $this->event = $event;
+        $eventDataService = app(EventDataService::class);
+
+        $this->event = $eventDataService->getEventData($eventId);
     }
 
-    public function toggleSeatStatus($seatId)
+    public function toggleSeatStatus(SeatReservationService $seatReservationService, $seatId)
     {
-        $seat = Seat::find($seatId);
-
-        if (!$seat) {
-            session()->flash('error', 'Seat not found.');
+        try {
+            $seat = $seatReservationService->find($seatId);
+            if (!$seat) {
+                session()->flash('error', 'Seat not found.');
+                return;
+            }
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error fetching seat: ' . $e->getMessage());
             return;
         }
 
@@ -35,14 +41,14 @@ class EventSeatMap extends Component
                 $seat->status = 'available';
                 break;
         }
-
         $seat->save();
-        $this->refreshSeats(); // Optional: refresh seat map
+
+        $this->refreshSeats($seatReservationService);
     }
 
-    public function refreshSeats()
+    public function refreshSeats(SeatReservationService $seatReservationService)
     {
-        $this->seats = Seat::where('event_id', $this->event->id)->get();
+        $this->seats = $seatReservationService->getAvailableSeats($this->event->id);
     }
 
     public function render()

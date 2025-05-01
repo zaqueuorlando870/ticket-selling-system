@@ -159,6 +159,9 @@ return [
         /*
          * Package Service Providers...
          */
+        App\Providers\UserRepositoryProvider::class,
+        App\Providers\EventRepositoryProvider::class,
+        App\Providers\SeatRepositoryProvider::class,
 
         /*
          * Application Service Providers...

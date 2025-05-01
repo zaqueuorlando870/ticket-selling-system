@@ -2,16 +2,16 @@
 
 
 <x-slot name="header">
-    <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+    <h2 class="text-xl font-semibold leading-tight text-gray-800">
         {{ __('Edit Event') }}
     </h2>
 </x-slot>
 
 <div class="py-12">
-    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-            <div class="bg-white shadow rounded-lg p-6">
-                <h2 class="text-2xl font-semibold mb-4">Edit Event</h2>
+    <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+        <div class="py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
+            <div class="p-6 bg-white rounded-lg shadow">
+                <h2 class="mb-4 text-2xl font-semibold">Edit Event</h2>
         
                 <!-- Success Message -->
                 @if (session()->has('message'))
@@ -21,26 +21,26 @@
                 <!-- Edit Form -->
                 <form wire:submit.prevent="update">
                     <div class="mb-4">
-                        <label for="title" class="block text-gray-700 font-medium">Title</label>
-                        <input type="text" id="title" wire:model="title" class="mt-2 block w-full p-3 border rounded" required />
+                        <label for="title" class="block font-medium text-gray-700">Title</label>
+                        <input type="text" id="title" wire:model="title" class="block w-full p-3 mt-2 border rounded" required />
                         @error('title') <span class="text-red-600">{{ $message }}</span> @enderror
                     </div>
         
                     <div class="mb-4">
-                        <label for="price" class="block text-gray-700 font-medium">Price</label>
-                        <input type="number" id="price" wire:model="price" class="mt-2 block w-full p-3 border rounded" required />
+                        <label for="price" class="block font-medium text-gray-700">Price</label>
+                        <input type="number" id="price" wire:model="price" class="block w-full p-3 mt-2 border rounded" required />
                         @error('price') <span class="text-red-600">{{ $message }}</span> @enderror
                     </div>
         
                     <div class="mb-4">
-                        <label for="event_date" class="block text-gray-700 font-medium">Event Date</label>
-                        <input type="date" id="event_date" wire:model="event_date" class="mt-2 block w-full p-3 border rounded" required />
+                        <label for="event_date" class="block font-medium text-gray-700">Event Date</label>
+                        <input type="date" id="event_date" wire:model="event_date" class="block w-full p-3 mt-2 border rounded" required />
                         @error('event_date') <span class="text-red-600">{{ $message }}</span> @enderror
                     </div>
         
-                    <div class="flex justify-between items-center">
-                        <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded">Update Event</button>
-                        <a href="{{ route('events.index') }}" class="text-gray-600">Cancel</a>
+                    <div class="flex items-center justify-between">
+                        <button type="submit" class="px-6 py-3 text-white bg-blue-600 rounded">Update Event</button>
+                        <a href="{{ route('event.index') }}" class="text-gray-600">Cancel</a>
                     </div>
                 </form>
             </div>

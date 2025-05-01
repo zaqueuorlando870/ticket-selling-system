@@ -3,9 +3,12 @@
 namespace App\Livewire;
 
 use Livewire\Component;
-use App\Models\Event;
-use App\Models\User;
-use App\Models\Seat;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+
+use App\Services\SeatReservationService;
+use App\Services\UserService;
+use App\Services\EventDataService;
 
 class EventSeatPurchase extends Component
 {
@@ -24,13 +27,19 @@ class EventSeatPurchase extends Component
         'selectedSeat' => 'required|exists:seats,id',
     ];
 
-
-    public function mount($eventId)
+    public function mount(EventDataService $eventDataService, $eventId)
     {
         $this->eventId = $eventId;
-        $this->event = Event::findOrFail($this->eventId);
-        $this->seats = Seat::where('event_id', $this->eventId)->where('is_reserved', 0)->get();
+        try {
+            $eventData = $eventDataService->getEventData($eventId);
+            $this->event = $eventData['event'];
+            $this->seats = $eventData['seats'];
+        } catch (\Exception $e) { 
+            Log::error('Error fetching event data: ' . $e->getMessage()); 
+            throw $e;
+        }
     }
+
 
     public function render()
     {
@@ -42,38 +51,40 @@ class EventSeatPurchase extends Component
         $this->selectedSeat = $id;
     }
 
-    public function purchaseSeat()
+    public function purchaseSeat(SeatReservationService $seatReservationService, \UserService $userService)
     {
         $this->validate();
 
-        $seat = Seat::where('id', $this->selectedSeat)
-            ->where('event_id', $this->eventId)
-            ->where('is_reserved', 0)
-            ->first();
-    
+        $seat = $seatReservationService->getAvailableSeat($this->selectedSeat, $this->eventId);
         if (!$seat) {
             session()->flash('error', 'This seat is already taken or invalid.');
             return;
         }
-    
+
         // Create the user (attendee)
-        $user = User::firstOrCreate(
-            ['email' => $this->email],
-            [
-                'name' => $this->first_name . ' ' . $this->last_name,
-                'password' => bcrypt('temporarypassword'),
-            ]
-        );
-    
-        $user->assignRole('attendee');
-    
+        $userData = [
+            'email' => $this->email,
+            'first_name' => $this->first_name,
+            'last_name' => $this->last_name,
+            'password' => Str::random(16),
+        ];
+        try {
+            $user = $userService->register($userData);
+        } catch (\Exception $e) {
+            session()->flash('error', 'Unable to create attendee user: ' . $e->getMessage());
+            return;
+        }
+
         // Reserve the seat
-        $seat->update([
-            'is_reserved' => 1,
-            'reserved_by' => $user->id,
-        ]);
-    
-        session()->flash('message', 'Seat purchased successfully and attendee information saved!');
+        try {
+            // Attempt to reserve the seat
+            $seatReservationService->reserveSeat($seat->id, $user->id);
+            // Flash a success message
+            session()->flash('message', 'Seat purchased successfully and attendee information saved!');
+        } catch (\Exception $e) {
+            // Flash an error message if the seat reservation fails
+            session()->flash('error', $e->getMessage());
+        }
     }
 }
 

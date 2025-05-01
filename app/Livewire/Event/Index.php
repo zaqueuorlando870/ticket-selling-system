@@ -3,12 +3,13 @@
 namespace App\Livewire\Event;
 
 use Livewire\Component;
-use App\Models\Event as Listings;
 use Illuminate\Support\Facades\Auth;
+use App\Services\EventDataService;
+use Illuminate\Support\Facades\Log;
 
 class Index extends Component
 {
-    public $events;
+    public  $events;
 
     protected $listeners = ['deleteConfirmed'];
 
@@ -17,9 +18,14 @@ class Index extends Component
         $this->events = Auth::user()->event;
     }
 
-    public function deleteConfirmed($eventId)
+    public function deleteConfirmed(EventDataService $eventDataService, $eventId)
     {
-        $event = Listings::findOrFail($eventId);
+        try {
+            $event = $eventDataService->getEventData($eventId);
+        } catch (\Exception $e) {
+            Log::error('Error fetching event data: ' . $e->getMessage());
+            return;
+        }
 
         if ($event->user_id !== Auth::id()) {
             abort(403);

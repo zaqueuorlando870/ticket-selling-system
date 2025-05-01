@@ -30,22 +30,18 @@ class AttemptSeatPurchase implements ShouldQueue
     public function handle()
     {
         DB::transaction(function () {
-            // Lock the seat row for update to prevent race conditions
             $seat = Seat::where('id', $this->seatId)->lockForUpdate()->first();
-    
-            // Check if the seat exists
+
             if (!$seat) {
                 info("Seat {$this->seatId} not found.");
                 return;
             }
     
-            // Check if the seat is already reserved
             if ($seat->is_reserved) {
                 info("User {$this->userId} FAILED to buy seat {$this->seatId} - already reserved.");
                 return;
             }
     
-            // Proceed with reserving the seat
             $seat->is_reserved = true;
             $seat->reserved_by = $this->userId;
             $seat->save();
