@@ -4,13 +4,13 @@
     </a>
 
     @if (session()->has('error'))
-        <div class="bg-red-500 text-white p-4 rounded mb-4">
+        <div class="p-4 mb-4 text-white bg-red-500 rounded">
             {{ session('error') }}
         </div>
     @endif
 
     @if (session()->has('message'))
-        <div class="bg-green-500 text-white p-4 rounded mb-4">
+        <div class="p-4 mb-4 text-white bg-green-500 rounded">
             {{ session('message') }}
         </div>
     @endif
@@ -31,7 +31,7 @@
     <div class="mt-4">
         <h3 class="text-xl font-semibold">Enter Your Details</h3>
 
-        <form wire:submit.prevent="purchaseSeat">
+        <form wire:submit.prevent="purchase">
             <div class="mt-2">
                 <label for="first_name" class="block">First Name</label>
                 <input type="text" id="first_name" wire:model="first_name" class="w-full p-2 mt-1 border rounded" required>
@@ -47,7 +47,7 @@
                 <input type="email" id="email" wire:model="email" class="w-full p-2 mt-1 border rounded" required>
             </div>
 
-            <button type="submit" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+            <button type="submit" class="px-4 py-2 mt-4 text-white bg-blue-600 rounded hover:bg-blue-700">
                 Purchase Seat
             </button>
         </form>

@@ -26,8 +26,15 @@ class EventFactory extends Factory
     public function definition(): array
     {
 
+        $user = User::inRandomOrder()->first();
+        
+        // If no user exists, create one
+        if (!$user) {
+            $user = User::factory()->create();
+        }
+
         return [
-            'user_id' => User::inRandomOrder()->first()->id,
+            'user_id' => $user->id, // Use the user ID
             'title' => $this->faker->sentence(),
             'description' => $this->faker->paragraph(),
             'price' => $this->faker->randomFloat(2, 0, 100),

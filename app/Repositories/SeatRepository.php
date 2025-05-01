@@ -13,7 +13,7 @@ class SeatRepository implements SeatRepositoryInterface
 
     public function find($id)
     {
-        return Seat::find($id);
+        return Seat::findOrFail($id);
     }
 
     public function findWhere($eventId = null, $seatId = null, $isReserved = null)

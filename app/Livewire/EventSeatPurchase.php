@@ -9,11 +9,12 @@ use Illuminate\Support\Str;
 use App\Services\SeatReservationService;
 use App\Services\UserService;
 use App\Services\EventDataService;
+use App\Models\Event;
 
 class EventSeatPurchase extends Component
 {
-    public $eventId;
-    public $event;
+    public int $eventId;
+    public Event $event;
     public $seats;
     public $selectedSeat;
     public $first_name;
@@ -27,15 +28,16 @@ class EventSeatPurchase extends Component
         'selectedSeat' => 'required|exists:seats,id',
     ];
 
-    public function mount(EventDataService $eventDataService, $eventId)
+    public function mount($eventId)
     {
         $this->eventId = $eventId;
+        $eventDataService = app(EventDataService::class);
         try {
             $eventData = $eventDataService->getEventData($eventId);
-            $this->event = $eventData['event'];
-            $this->seats = $eventData['seats'];
-        } catch (\Exception $e) { 
-            Log::error('Error fetching event data: ' . $e->getMessage()); 
+            $this->event = $eventData;
+            $this->seats = $eventData;
+        } catch (\Exception $e) {
+            Log::error('Error fetching event data: ' . $e->getMessage());
             throw $e;
         }
     }
@@ -51,10 +53,37 @@ class EventSeatPurchase extends Component
         $this->selectedSeat = $id;
     }
 
-    public function purchaseSeat(SeatReservationService $seatReservationService, \UserService $userService)
+    public function reserve($seatId)
     {
-        $this->validate();
+        $seatReservationService = app(SeatReservationService::class);
+        $seatReservationService->reserveSeat($seatId, request('user_id'));
+        $seat = $seatReservationService->find($seatId);
+        $seat->is_reserved = true;
+        $seat->save();
+    }
 
+    public function purchase($seatId){
+        dd($seatId);
+        $seatReservationService = app(SeatReservationService::class);
+        $seatReservationService->purchaseTicket($seatId, request('user_id'));
+        $seat = $seatReservationService->find($seatId);
+        $seat->is_sold = true;
+        $seat->save();
+    }
+
+
+    public function purchaseSeat($seatId = null, $eventId = null)
+    {
+        if (is_null($seatId) && is_null($eventId)) {
+            $seatId = $this->selectedSeat;
+            $eventId = $this->eventId;
+        } else {
+            $this->selectedSeat = $seatId;
+            $this->eventId = $eventId;
+        }
+        $this->validate();
+        $seatReservationService = app(SeatReservationService::class);
+        $userService = app(\UserService::class);
         $seat = $seatReservationService->getAvailableSeat($this->selectedSeat, $this->eventId);
         if (!$seat) {
             session()->flash('error', 'This seat is already taken or invalid.');
@@ -87,4 +116,3 @@ class EventSeatPurchase extends Component
         }
     }
 }
-

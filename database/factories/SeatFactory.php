@@ -19,8 +19,8 @@ class SeatFactory extends Factory
         return [
             'event_id' => $this->faker->randomElement([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
             'label' => $this->faker->word(),
-            'is_reserved' => $this->faker->randomElement([0, 1]),
-            'is_sold' => $this->faker->randomElement([0, 1]),
+            'is_reserved' => $this->faker->boolean(),
+            'is_sold' => $this->faker->boolean(),
             'reserved_by' => $this->faker->randomElement([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
         ];
     }

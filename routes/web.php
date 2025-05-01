@@ -7,6 +7,7 @@ use App\Livewire\Event\Edit;
 use App\Livewire\Admin\UsersList;
 use App\Livewire\Guest\EventCatalog;
 use App\Livewire\Admin\PurchaseList;
+use App\Livewire\EventSeatPurchase;
 
 
 
@@ -40,5 +41,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/admin/users', UsersList::class)->name('admin.users');
     Route::get('/admin/purchases', PurchaseList::class)->name('admin.purchases');
 });
+
+Route::post('/seats/{id}/reserve', [EventSeatPurchase::class, 'reserve'])->name('seat.reserve');
+Route::post('/seats/{id}/purchase', [EventSeatPurchase::class, 'purchase'])->name('seat.purchase');
 
 require __DIR__.'/auth.php';

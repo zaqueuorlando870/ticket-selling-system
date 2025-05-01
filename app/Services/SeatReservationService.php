@@ -17,7 +17,7 @@ class SeatReservationService
     public function reserveSeat(int $seatId, int $userId): void
     {
         DB::transaction(function () use ($seatId, $userId) {
-            $seat = $this->seatRepository->find($seatId);
+            $seat = $this->find($seatId);
 
             if (!$seat || $seat->is_reserved || $seat->is_sold) {
                 throw new Exception('Seat is not available.');
@@ -43,5 +43,22 @@ class SeatReservationService
     public function getAvailableSeats(int $eventId)
     {
         return $this->seatRepository->findWhere(null, $eventId, 0);
+    }
+
+    public function purchaseTicket(int $seatId, int $userId): void
+    {
+        DB::transaction(function () use ($seatId, $userId) {
+            $seat = $this->find($seatId);
+
+            if (!$seat || $seat->is_reserved || $seat->is_sold) {
+                throw new Exception('Seat is not available.');
+            }
+
+            $this->seatRepository->update($seat->id, [
+                'is_reserved' => true,
+                'is_sold' => true,
+                'sold_by' => $userId,
+            ]);
+        });
     }
 }

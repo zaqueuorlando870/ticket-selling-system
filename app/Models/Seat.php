@@ -12,17 +12,17 @@ class Seat extends Model
 
     public function isAvailable()
     {
-        return !$this->is_reserved && !$this->is_sold;
+        return (bool) !$this->is_reserved && !$this->is_sold;
     }
 
     public function isReserved()
     {
-        return $this->is_reserved && !$this->is_sold;
+        return (bool) $this->is_reserved && !$this->is_sold;
     }
 
     public function isSold()
     {
-        return $this->is_sold;
+        return (bool)$this->is_sold;
     }
 
     public function reservedBy()
