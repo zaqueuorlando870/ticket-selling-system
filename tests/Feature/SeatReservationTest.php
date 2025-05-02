@@ -14,6 +14,9 @@ class SeatReservationTest extends TestCase
 {
     use RefreshDatabase;
 
+    /**
+     * @group feature
+     */
     public function test_a_seat_can_be_reserved()
     {
         // Create the event first

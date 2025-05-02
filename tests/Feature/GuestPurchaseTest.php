@@ -3,12 +3,9 @@
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithSession;
-use Livewire\Livewire;
 use App\Models\Seat;
 use App\Models\Event;
-use App\Livewire\EventSeatPurchase;
 use App\Models\User;
 use Tests\TestCase;
 use Illuminate\Support\Facades\Notification;
@@ -18,7 +15,7 @@ class GuestPurchaseTest extends TestCase
     use RefreshDatabase, InteractsWithSession;
 
     /**
-     * @test
+     * @group feature
      */
     public function test_guest_purchase_fails_if_email_is_already_in_use()
     {
@@ -38,8 +35,8 @@ class GuestPurchaseTest extends TestCase
         $response = $this->post('/seats/' . $seat->id . '/guest', [
             'name' => $user->name,
             'email' => $user->email,
-        ]);   
-        
+        ]);
+
         // Assert the seat is now sold after the action
         $seat->refresh();
         $this->assertFalse($seat->isSold());
@@ -47,4 +44,3 @@ class GuestPurchaseTest extends TestCase
         $response->assertStatus(200);
     }
 }
-
