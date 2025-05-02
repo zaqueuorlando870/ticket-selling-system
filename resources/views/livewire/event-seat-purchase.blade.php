@@ -31,7 +31,7 @@
     <div class="mt-4">
         <h3 class="text-xl font-semibold">Enter Your Details</h3>
 
-        <form wire:submit.prevent="registerGuest">
+        <form wire:submit.prevent="guestPurchase">
             @auth
             <input type="hidden" id="user_id" wire:model="user_id" class="w-full p-2 mt-1 border rounded" required>
             @endauth

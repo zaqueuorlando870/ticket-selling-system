@@ -45,9 +45,6 @@ class SeatPurchaseTest extends TestCase
         $response->assertStatus(200);
     }
 
-    /**
-     * @group feature
-     */
     public function it_reserves_a_seat_for_a_user()
     {
         $seat = Seat::factory()->create(['is_reserved' => false]);
@@ -60,9 +57,6 @@ class SeatPurchaseTest extends TestCase
         $this->assertEquals($user->id, $seat->fresh()->reserved_by);
     }
 
-    /**
-     * @group feature
-     */
     public function it_fails_to_reserve_a_seat_if_already_reserved()
     {
         $seat = Seat::factory()->create(['is_reserved' => true]);
@@ -74,9 +68,7 @@ class SeatPurchaseTest extends TestCase
         $this->assertFalse($seat->fresh()->reserved_by === $user->id);
     }
 
-    /**
-     * @group feature
-     */
+
     public function it_fails_to_reserve_a_seat_if_seat_does_not_exist()
     {
         $user = User::factory()->create();
@@ -87,9 +79,6 @@ class SeatPurchaseTest extends TestCase
         $this->assertNull(Seat::find(999));
     }
 
-    /**
-     * @group feature
-     */
     public function multiple_users_cannot_reserve_the_same_seat()
     {
         $seat = Seat::factory()->create(['is_reserved' => false]);

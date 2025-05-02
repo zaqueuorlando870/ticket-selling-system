@@ -32,7 +32,11 @@ class UserService
     public function registerGuest($userData)
     {
         $userData['password'] = Hash::make(12345678);
-        return $this->userRepository->create($userData);
+        $getUserByEmail = $this->getUserByEmail($userData['email']);
+        if(!$getUserByEmail){
+            return $this->userRepository->create($userData);
+        }
+        return $getUserByEmail;
     }
     public function updateProfile($userId, $userData)
     {

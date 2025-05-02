@@ -49,7 +49,6 @@ class SeatReservationService
     {
         DB::transaction(function () use ($seatId, $userId) {
             $seat = $this->find($seatId);
-
             if (!$seat || $seat->is_reserved || $seat->is_sold) {
                 throw new Exception('Seat is not available.');
             }

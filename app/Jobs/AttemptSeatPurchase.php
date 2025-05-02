@@ -36,13 +36,14 @@ class AttemptSeatPurchase implements ShouldQueue
                 info("Seat {$this->seatId} not found.");
                 return;
             }
-    
-            if ($seat->is_reserved) {
-                info("User {$this->userId} FAILED to buy seat {$this->seatId} - already reserved.");
+
+            if ($seat->is_reserved || $seat->is_sold) {
+                info("User {$this->userId} FAILED to buy seat {$this->seatId} - already reserved or sold.");
                 return;
-            }
+            }    
     
             $seat->is_reserved = true;
+            $seat->is_sold = true;
             $seat->reserved_by = $this->userId;
             $seat->save();
     

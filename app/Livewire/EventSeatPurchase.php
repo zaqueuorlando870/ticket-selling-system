@@ -75,7 +75,7 @@ class EventSeatPurchase extends Component
                 $user = $userService->registerGuest($data);
             } 
             request()->merge(['user_id' => $user->id]);
-            $this->purchase($this->selectedSeat);
+            $this->purchase($this->selectedSeat ?? request('id'));
             session()->flash('status', 'Guest Registered Successfully');
         } catch (\Exception $e) {
             session()->flash('error', 'Unable to Register User: ' . $e->getMessage());
