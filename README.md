@@ -76,6 +76,7 @@ To run the test suite, execute the following command:
 
 ```bash
 php artisan test
+php artisan test --group=feature
 ```
 
 This will run all unit and feature tests to ensure the system functions as expected.
