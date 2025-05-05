@@ -55,7 +55,7 @@ A Laravel-based ticketing platform for creating events, managing seat reservatio
 
 5. Run the migrations to set up the database:
    ```bash
-   php artisan migrate
+   php artisan migrate --seed
    ```
 
 6. Seed the database with initial data (optional):
@@ -68,7 +68,11 @@ A Laravel-based ticketing platform for creating events, managing seat reservatio
    php artisan serve
    ```
 
----
+## Admin Login Credentials
+
+- **Email:** admin@admin.com  
+- **Password:** 123456
+
 
 ## Running Tests
 
@@ -78,5 +82,3 @@ To run the test suite, execute the following command:
 php artisan test
 php artisan test --group=feature
 ```
-
-This will run all unit and feature tests to ensure the system functions as expected.

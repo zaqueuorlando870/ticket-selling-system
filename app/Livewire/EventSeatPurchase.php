@@ -88,6 +88,7 @@ class EventSeatPurchase extends Component
         $seatReservationService = app(SeatReservationService::class);
         try {
             $seatReservationService->purchaseTicket($seatId, request('user_id'));
+            session()->flash('status', 'Your Seat has been purchased successfully! Thank you for your order.');
         } catch (\Exception $e) {
             session()->flash('error', 'Unable to purchase ticket: ' . $e->getMessage());
             return;

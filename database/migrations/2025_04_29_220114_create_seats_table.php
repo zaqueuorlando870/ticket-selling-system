@@ -18,6 +18,7 @@ return new class extends Migration
             $table->boolean('is_reserved')->default(false); // Reserved status
             $table->boolean('is_sold')->default(false); // Sold status
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
